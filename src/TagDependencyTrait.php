@@ -73,6 +73,7 @@ trait TagDependencyTrait
             return [];
         }
 
+        $cacheFields = (is_array($cacheFields) && !empty($cacheFields) && is_array($cacheFields[0])) ? $cacheFields : [$cacheFields];
         $tags = [];
 
         foreach ($cacheFields as $tagFields) {
