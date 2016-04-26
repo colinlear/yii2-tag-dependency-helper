@@ -41,7 +41,7 @@ trait TagDependencyTrait
      * @param array Changed fields from Update Event
      * @return string tag name
      */
-    public function objectTag($oldfields)
+    public function objectTag($oldfields = [])
     {
         /** @var \yii\db\ActiveRecord $this */
         $primary_key;
@@ -64,7 +64,7 @@ trait TagDependencyTrait
      * @param array Changed fields from Update Event
      * @return array tag names
      */
-    public function objectCompositeTag($oldfields)
+    public function objectCompositeTag($oldfields = [])
     {
         /** @var \yii\db\ActiveRecord|TagDependencyTrait $this */
         $cacheFields = $this->cacheCompositeTagFields();
