@@ -38,6 +38,7 @@ trait TagDependencyTrait
 
     /**
      * Returns object tag name including it's id
+     * @param array Changed fields from Update Event
      * @return string tag name
      */
     public function objectTag($oldfields)
@@ -60,6 +61,7 @@ trait TagDependencyTrait
 
     /**
      * Returns composite tags name including fields
+     * @param array Changed fields from Update Event
      * @return array tag names
      */
     public function objectCompositeTag($oldfields)
@@ -181,6 +183,7 @@ trait TagDependencyTrait
 
     /**
      * Invalidate model tags.
+     * @param yii\db\AfterSaveEvent when called as an event handler.
      * @return bool
      */
     public function invalidateTags($event = null)
