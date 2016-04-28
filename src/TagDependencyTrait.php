@@ -44,7 +44,7 @@ trait TagDependencyTrait
     public function objectTag($oldFields = [])
     {
         /** @var \yii\db\ActiveRecord $this */
-        $primaryKey;
+        $primaryKey = null;
         if (count($this->primaryKey()) === 1)
         {
             $key = $this->primaryKey()[0];
@@ -184,24 +184,25 @@ trait TagDependencyTrait
 
     /**
      * Invalidate model tags.
-     * @param yii\db\AfterSaveEvent $event when called as an event handler.
+     * @param yii\db\AfterSaveEvent|null $event when called as an event handler.
      * @return bool
      */
     public function invalidateTags($event = null)
     {
         /** @var TagDependencyTrait $this */
+        $oldFields = $event !== null && $event->name === ActiveRecord::EVENT_AFTER_UPDATE ? $event->changedAttributes : [];
         \yii\caching\TagDependency::invalidate(
             $this->getTagDependencyCacheComponent(),
             [
                 static::commonTag(),
-                $this->objectTag($event !== null && $event->name === ActiveRecord::EVENT_AFTER_UPDATE ? $event->changedAttributes : [])
+                $this->objectTag($oldFields)
             ]
         );
 
         if (!empty($this->cacheCompositeTagFields())) {
             \yii\caching\TagDependency::invalidate(
                 $this->getTagDependencyCacheComponent(),
-                $this->objectCompositeTag($event !== null && $event->name === ActiveRecord::EVENT_AFTER_UPDATE ? $event->changedAttributes : [])
+                $this->objectCompositeTag($oldFields)
             );
         }
 
