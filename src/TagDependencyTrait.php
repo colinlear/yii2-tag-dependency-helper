@@ -38,33 +38,33 @@ trait TagDependencyTrait
 
     /**
      * Returns object tag name including it's id
-     * @param array Changed fields from Update Event
+     * @param array $oldFields Changed fields from Update Event
      * @return string tag name
      */
-    public function objectTag($oldfields = [])
+    public function objectTag($oldFields = [])
     {
         /** @var \yii\db\ActiveRecord $this */
-        $primary_key;
-        if (count($this->primaryKey()) == 1)
+        $primaryKey;
+        if (count($this->primaryKey()) === 1)
         {
             $key = $this->primaryKey()[0];
-            $primary_key = isset($oldfields[$key]) ? $oldfields[$key] : $this->$key;
+            $primaryKey = isset($oldFields[$key]) ? $oldFields[$key] : $this->$key;
         } else {
-            $primary_key = [];
+            $primaryKey = [];
             foreach ($this->primaryKey() as $key)
             {
-                $primary_key[$key] = isset($oldfields[$key]) ? $oldfields[$key] : $this->$key;
+                $primaryKey[$key] = isset($oldFields[$key]) ? $oldFields[$key] : $this->$key;
             }
         }
-        return NamingHelper::getObjectTag($this->className(), $primary_key);
+        return NamingHelper::getObjectTag($this->className(), $primaryKey);
     }
 
     /**
      * Returns composite tags name including fields
-     * @param array Changed fields from Update Event
+     * @param array $oldFields Changed fields from Update Event
      * @return array tag names
      */
-    public function objectCompositeTag($oldfields = [])
+    public function objectCompositeTag($oldFields = [])
     {
         /** @var \yii\db\ActiveRecord|TagDependencyTrait $this */
         $cacheFields = $this->cacheCompositeTagFields();
@@ -82,7 +82,7 @@ trait TagDependencyTrait
 
             foreach ($tagFields as $tagField) {
                 $tag[$tagField] = $this->$tagField;
-                $changed |= isset($oldfields[$tagField]);
+                $changed |= isset($oldFields[$tagField]);
             }
 
             $tags[] = NamingHelper::getCompositeTag($this->className(), $tag);
@@ -90,7 +90,7 @@ trait TagDependencyTrait
             if ($changed) {
                 $tag = [];
                 foreach ($tagFields as $tagField) {
-                    $tag[$tagField] = isset($oldfields[$tagField]) ? $oldfields[$tagField] : $this->$tagField;
+                    $tag[$tagField] = isset($oldFields[$tagField]) ? $oldFields[$tagField] : $this->$tagField;
                 }
                 $tags[] = NamingHelper::getCompositeTag($this->className(), $tag);
             }
@@ -184,7 +184,7 @@ trait TagDependencyTrait
 
     /**
      * Invalidate model tags.
-     * @param yii\db\AfterSaveEvent when called as an event handler.
+     * @param yii\db\AfterSaveEvent $event when called as an event handler.
      * @return bool
      */
     public function invalidateTags($event = null)
@@ -194,14 +194,14 @@ trait TagDependencyTrait
             $this->getTagDependencyCacheComponent(),
             [
                 static::commonTag(),
-                $this->objectTag($event != null && $event->name == ActiveRecord::EVENT_AFTER_UPDATE ? $event->changedAttributes : [])
+                $this->objectTag($event !== null && $event->name === ActiveRecord::EVENT_AFTER_UPDATE ? $event->changedAttributes : [])
             ]
         );
 
         if (!empty($this->cacheCompositeTagFields())) {
             \yii\caching\TagDependency::invalidate(
                 $this->getTagDependencyCacheComponent(),
-                $this->objectCompositeTag($event != null && $event->name == ActiveRecord::EVENT_AFTER_UPDATE ? $event->changedAttributes : [])
+                $this->objectCompositeTag($event !== null && $event->name === ActiveRecord::EVENT_AFTER_UPDATE ? $event->changedAttributes : [])
             );
         }
 
